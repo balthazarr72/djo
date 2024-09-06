@@ -1,0 +1,37 @@
+name: Windows - LiteManager
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Start Building...
+    runs-on: windows-latest
+    timeout-minutes: 120 # Ajusté à 120 minutes pour éviter des jobs qui tournent trop longtemps
+
+    steps:
+      # Téléchargement et installation des fichiers essentiels
+      - name: Downloading & Installing Essentials
+        run: |
+          Invoke-WebRequest -Uri "https://gitlab.com/chamod12/lm_win-10_github_rdp/-/raw/main/Downloads.bat" -OutFile "Downloads.bat"
+          if ((Get-FileHash "Downloads.bat").Hash -ne 'EXPECTED_HASH') {
+            Write-Error "Le fichier téléchargé ne correspond pas au hash attendu, téléchargement annulé."
+          }
+          cmd /c Downloads.bat
+
+      # Connexion à LiteManager
+      - name: Connect to LiteManager
+        run: |
+          if (Test-Path "show.bat") {
+            cmd /c show.bat
+          } else {
+            Write-Error "Le fichier show.bat est introuvable."
+          }
+
+      # Compteur de temps
+      - name: Time Counter
+        run: |
+          if (Test-Path "loop.bat") {
+            cmd /c loop.bat
+          } else {
+            Write-Error "Le fichier loop.bat est introuvable."
